@@ -21,7 +21,7 @@
      <section> is a self-contained, inline-styled 1920×1080 artboard, and
      deck-stage.js letterboxes that canvas into whatever screen it lands on.
      Everything in this stylesheet is chrome around those artboards — the
-     name-entry cover screens, the slide reveal engine, and presenter mode.
+     name-entry cover screens, the slide reveal engine, and the deck chrome.
      Slide copy is client-approved: change markup, not words.
      ========================================================================== */
 
@@ -294,7 +294,7 @@
   #welcome-screen.is-on .welcome-inner > *:nth-child(4) { animation-delay: 1.00s; }
 
   /* ==========================================================================
-     IN-DECK CHROME — export control + presenter panel
+     IN-DECK CHROME — export + fullscreen controls
      ========================================================================== */
   .fab {
     position: fixed; z-index: 2147483500;
@@ -313,8 +313,12 @@
   .fab.avail:hover { opacity: 1; background: rgba(18,32,12,.88); }
   .fab svg { width: 15px; height: 15px; }
   #export-fab { right: 22px; top: 20px; }
-  #presenter-fab { right: 22px; top: 68px; }
-  #presenter-fab.on { opacity: 1; background: rgba(44,78,37,.92); border-color: rgba(255,255,255,.4); }
+  #fullscreen-fab { right: 22px; top: 68px; }
+  /* One glyph at a time — every toggle reads "enter" or "exit" by state. */
+  [data-fullscreen-toggle] .fs-exit,
+  [data-fullscreen-toggle].on .fs-enter { display: none; }
+  [data-fullscreen-toggle].on .fs-exit { display: block; }
+  .prep-btn[data-fullscreen-toggle] { display: inline-flex; align-items: center; }
 
   /* ── Closing slide: export the record without leaving the deck ──
      Sits in the final slide's own 1920×1080 coordinate space, so it scales
@@ -339,42 +343,12 @@
   .export-cta:focus-visible { outline: 3px solid var(--forest-500); outline-offset: 3px; }
   @media print { .closing-export { display: none !important; } }
 
-  /* Presenter panel — speaker notes + what's coming, for the person talking. */
-  #presenter {
-    position: fixed; left: 22px; bottom: 22px; z-index: 2147483400;
-    width: 460px; max-width: calc(100vw - 44px);
-    padding: 22px 24px 20px; border-radius: 18px;
-    background: rgba(12,22,9,.86);
-    -webkit-backdrop-filter: blur(18px) saturate(120%); backdrop-filter: blur(18px) saturate(120%);
-    border: 1px solid rgba(255,255,255,.16);
-    box-shadow: 0 24px 60px rgba(0,0,0,.5);
-    color: var(--cream-50);
-    opacity: 0; transform: translateY(10px); pointer-events: none;
-    transition: opacity .3s var(--deck-ease), transform .3s var(--deck-ease);
-  }
-  #presenter.on { opacity: 1; transform: none; pointer-events: auto; }
-  #presenter .p-head {
-    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-    padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,.16);
-  }
-  #presenter .p-label {
-    font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
-    color: var(--forest-500);
-  }
-  #presenter .p-count { font-size: 11px; letter-spacing: .12em; color: rgba(255,255,255,.5); font-variant-numeric: tabular-nums; }
-  #presenter .p-title { font-family: Castoro, serif; font-size: 26px; letter-spacing: -.02em; margin-bottom: 10px; }
-  #presenter .p-notes { font-size: 15px; line-height: 1.55; color: rgba(255,255,255,.82); }
-  #presenter .p-next {
-    margin-top: 16px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,.14);
-    font-size: 12px; letter-spacing: .04em; color: rgba(255,255,255,.55);
-  }
-  #presenter .p-next b { color: rgba(255,255,255,.85); font-weight: 600; }
 
   /* ==========================================================================
      PRINT — the welcome page becomes page 1, then one slide per page
      ========================================================================== */
   @media print {
-    #prep-screen, .fab, #presenter { display: none !important; }
+    #prep-screen, .fab { display: none !important; }
     #cover-stage {
       position: static !important; display: block !important;
       background: none !important; overflow: visible !important;
@@ -428,6 +402,10 @@
           </label>
           <div class="prep-actions">
             <button type="submit" class="prep-btn primary">Begin presentation →</button>
+            <button type="button" class="prep-btn ghost" data-fullscreen-toggle>
+              <svg class="fs-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+              <svg class="fs-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h3a2 2 0 0 0 2-2V3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/></svg>
+              <span class="fs-label">Fullscreen</span></button>
             <button type="button" id="prep-export" class="prep-btn ghost">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Export PDF for records</button>
           </div>
@@ -453,19 +431,11 @@
 <button id="export-fab" class="fab" type="button" aria-label="Export presentation as PDF" hidden>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Export PDF
 </button>
-<button id="presenter-fab" class="fab" type="button" aria-label="Toggle presenter notes" hidden>
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H4z"/><path d="M12 16v4"/><path d="M8 20h8"/></svg>Notes <span style="opacity:.6">P</span>
+<button id="fullscreen-fab" class="fab" type="button" aria-label="Toggle fullscreen" data-fullscreen-toggle hidden>
+  <svg class="fs-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+  <svg class="fs-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h3a2 2 0 0 0 2-2V3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/></svg>
+  <span class="fs-label">Fullscreen</span> <span style="opacity:.6">F</span>
 </button>
-
-<aside id="presenter" aria-live="polite">
-  <div class="p-head">
-    <span class="p-label">Presenter notes</span>
-    <span class="p-count" id="p-count"></span>
-  </div>
-  <div class="p-title" id="p-title"></div>
-  <div class="p-notes" id="p-notes"></div>
-  <div class="p-next" id="p-next"></div>
-</aside>
 
 <deck-stage width="1920" height="1080">
 
@@ -1089,7 +1059,6 @@
     deck.addEventListener('slidechange', (e) => {
       document.querySelectorAll('deck-stage > section').forEach((s) => s.classList.remove('in-view'));
       if (e.detail.slide) replay(e.detail.slide);
-      window.__syncPresenter && window.__syncPresenter(e.detail);
     });
 
     // The deck may have initialised before this listener attached.
@@ -1105,52 +1074,60 @@
   })();
 
   /* ==========================================================================
-     2. Presenter mode — speaker notes from the design handoff, P to toggle
+     2. Fullscreen — the deck is meant to fill the consult-room display
      --------------------------------------------------------------------------
-     Deep links need no code here: deck-stage already reads a 1-indexed #N on
+     Toggled by F, by the floating control, or from the preparation screen so
+     the room is set up before the patient sits down. Esc exits natively, and
+     the browser only grants fullscreen from a real user gesture, so every
+     entry point here hangs off a click or keypress.
+
+     Deep links need no code either: deck-stage already reads a 1-indexed #N on
      load and keeps it in sync as you navigate, so #12 is linkable as-is. Note
      that N counts deck slides — the welcome screen is 01 of the printed 25 but
      lives outside the deck, so #1 is the Title slide, printed "02 / 25".
      ========================================================================== */
   (() => {
-    const panel = document.getElementById('presenter');
-    const fab   = document.getElementById('presenter-fab');
-    const deck  = document.querySelector('deck-stage');
-    const elCount = document.getElementById('p-count');
-    const elTitle = document.getElementById('p-title');
-    const elNotes = document.getElementById('p-notes');
-    const elNext  = document.getElementById('p-next');
+    const root = document.documentElement;
+    const isOn = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+    const supported = !!(root.requestFullscreen || root.webkitRequestFullscreen);
 
-    let on = new URLSearchParams(location.search).get('presenter') === '1';
-
-    window.__syncPresenter = (detail) => {
-      const slide = detail.slide;
-      if (!slide) return;
-      const printed = detail.index + 2;                    // welcome screen is 01
-      elCount.textContent = String(printed).padStart(2, '0') + ' / ' + (detail.total + 1);
-      elTitle.textContent = slide.dataset.label || '';
-      elNotes.textContent = slide.dataset.speakerNotes || 'No notes for this slide.';
-      const next = deck.children[detail.index + 1];
-      elNext.innerHTML = next
-        ? 'Next &nbsp;·&nbsp; <b>' + next.dataset.label + '</b>'
-        : 'Last slide';
+    window.__toggleFullscreen = () => {
+      if (!supported) return;
+      const p = isOn()
+        ? (document.exitFullscreen || document.webkitExitFullscreen).call(document)
+        : (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+      // Denied or unsupported is not an error worth surfacing mid-meeting.
+      if (p && p.catch) p.catch(() => {});
     };
 
-    const apply = () => {
-      panel.classList.toggle('on', on);
-      fab.classList.toggle('on', on);
-      if (on && deck.index != null) {
-        window.__syncPresenter({ slide: deck.children[deck.index], index: deck.index, total: deck.children.length });
-      }
+    // Reflect the real state, which also changes via Esc or the browser's own UI.
+    const sync = () => {
+      const on = isOn();
+      document.querySelectorAll('[data-fullscreen-toggle]').forEach((b) => {
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', String(on));
+        const label = b.querySelector('.fs-label');
+        if (label) label.textContent = on ? 'Exit fullscreen' : 'Fullscreen';
+      });
     };
-    window.__togglePresenter = () => { on = !on; apply(); };
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach((evt) =>
+      document.addEventListener(evt, sync));
 
-    fab.addEventListener('click', window.__togglePresenter);
-    window.addEventListener('keydown', (e) => {
-      if (window.__deckLocked) return;
-      if (e.key === 'p' || e.key === 'P') { e.preventDefault(); window.__togglePresenter(); }
-    });
-    apply();
+    if (!supported) {
+      document.querySelectorAll('[data-fullscreen-toggle]').forEach((b) => {
+        b.hidden = true;
+        b.dataset.unsupported = '1';
+      });
+    } else {
+      document.querySelectorAll('[data-fullscreen-toggle]').forEach((b) =>
+        b.addEventListener('click', (e) => { e.stopPropagation(); window.__toggleFullscreen(); }));
+      window.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+        if (e.key === 'f' || e.key === 'F') { e.preventDefault(); window.__toggleFullscreen(); }
+      });
+    }
+    sync();
   })();
 
   /* ==========================================================================
@@ -1166,7 +1143,7 @@
     const welcomeTtl  = welcome.querySelector('.welcome-title');
     const beginBtn    = document.getElementById('welcome-begin');
     const exportFab   = document.getElementById('export-fab');
-    const presFab     = document.getElementById('presenter-fab');
+    const fsFab       = document.getElementById('fullscreen-fab');
     const deck        = document.querySelector('deck-stage');
     const coverStage  = document.getElementById('cover-stage');
     const coverCanvas = document.getElementById('cover-canvas');
@@ -1252,7 +1229,7 @@
       coverTimer = setTimeout(() => { coverStage.hidden = true; }, 640);
       if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
       exportFab.hidden = false;
-      presFab.hidden = false;
+      if (fsFab.dataset.unsupported !== '1') fsFab.hidden = false;
       // deck-stage has already landed on the title slide, or on the one a #N
       // deep link asked for. Leave that alone and just re-run the entrance,
       // which played hidden underneath the cover screens.
@@ -1307,11 +1284,11 @@
     window.addEventListener('mousemove', () => {
       if (!started) return;
       exportFab.classList.add('avail');
-      presFab.classList.add('avail');
+      fsFab.classList.add('avail');
       clearTimeout(fabTimer);
       fabTimer = setTimeout(() => {
         exportFab.classList.remove('avail');
-        presFab.classList.remove('avail');
+        fsFab.classList.remove('avail');
       }, 2600);
     }, { passive: true });
 

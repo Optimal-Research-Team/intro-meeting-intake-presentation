@@ -13,8 +13,9 @@ and it runs.
 ## The flow
 
 1. **Preparation** — before the patient walks in, the front desk types their
-   name and confirms the date. Nothing is stored or sent anywhere; the values
-   live in the page for the length of the meeting.
+   name, confirms the date, and can put the display into fullscreen. Nothing is
+   stored or sent anywhere; the values live in the page for the length of the
+   meeting.
 2. **Welcome** — the animated leaves-canopy wallpaper with the Optimal wordmark,
    and *"Welcome, [Name]"* beneath it. This is screen 01 of the printed 25.
 3. **The deck** — 24 slides at a fixed 1920×1080 artboard, letterboxed to fit
@@ -27,7 +28,7 @@ and it runs.
 | Next / previous | `→` `←`, `PgDn` `PgUp`, `Space`, or tap the right/left half on touch |
 | Jump to a slide | `Home` / `End`, number keys, or the overlay at the bottom |
 | Restart | `R` |
-| Presenter notes | `P`, the **Notes** button, or load with `?presenter=1` |
+| Fullscreen | `F`, the floating control, or **Fullscreen** on the preparation screen (`Esc` exits) |
 | Deep link a slide | `#12` in the URL — `#1` is the Title slide (printed "02 / 25") |
 | Pre-set the name | `?name=Sarah` |
 | Export a PDF | **Export as PDF** on the closing slide, the floating control, or the preparation screen |
@@ -71,6 +72,8 @@ works, but a local server is more reliable for fonts and images.
   slides depend on its contract: every direct-child `<section>` is a slide. It
   also owns the URL hash.
 - **Reuse the tokens** in `colors_and_type.css` rather than hardcoding hex values.
+- Each slide keeps its `data-speaker-notes` attribute from the design handoff.
+  Nothing renders it — it is inert documentation of what the slide is for.
 
 ### How the animations work
 
