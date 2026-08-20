@@ -38,7 +38,7 @@ and it runs.
 The export runs the browser's print path (**Save as PDF**), laying out one
 slide per page with the patient's name and date stamped into the filename. The
 welcome screen becomes page 1; live affordances (buttons, keyboard hints, the
-presenter panel) are dropped from the printed record.
+floating controls) are dropped from the printed record.
 
 Use **Landscape** and enable **Background graphics**.
 
