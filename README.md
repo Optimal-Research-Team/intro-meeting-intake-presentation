@@ -1,7 +1,7 @@
-# Optimal — Introductory Meeting & Possible Intake
+# Optimal — Introductory Meeting
 
 The patient-facing orientation presentation shown during the in-clinic
-**Introductory Meeting + Possible Intake** at Optimal Health Clinic (Barrie, ON).
+**Introductory Meeting** at Optimal Health Clinic (Barrie, ON).
 25 screens: a personalised welcome, then 24 slides covering the membership,
 the care team, plans, policies, and next steps.
 
